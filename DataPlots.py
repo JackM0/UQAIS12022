@@ -6,21 +6,30 @@ import pylab as py
 
 # Finds data file given Case label, diameter, depth and position index
 # Returns Network object or -1 if file was not found
-def getData(xx,yy,mm,nn, path = "Data\\" ):
+def getData(xx,yy,mm,nn, domain = 's', path = "Data\\"):
     path = path + xx + "_Diameter" + yy + "_Depth" + mm + "_" + nn + ".s1p"
     try:
         data = rf.Network(path)
     except FileNotFoundError:
         data = -1
         print(f"Error Finding Data File, File that was checked: {path}")
+    if data != -1:
+        if domain == "impulse":
+            data = data.impulse_response()
+        elif domain == "step":
+            data = data.step_response()
+
     return data
+
+    
+
 
 data1 = getData("01","10","10","1")
 data2 = getData("01","10","10","2")
 data3 = getData("02","10","30","1")
 data4 = getData("03","10","50","1")
 print(data1)
-
+'''
 # Plot data from adjacent measurment positions
 py.figure(1)
 data1.plot_s_db()
@@ -48,4 +57,26 @@ try:
     assert data5 == -1
 except AssertionError:
     print("Error did not trigger")
+'''
 
+# Time Domain Plots - Step Response
+time1_step = getData("01","10","10","1", "step")
+time3_step = data3.step_response()
+time4_step = data4.step_response()
+py.figure(5)
+py.plot(time1_step[0], time1_step[1], '--')
+py.plot(time3_step[0], time3_step[1], '--')
+py.plot(time4_step[0], time4_step[1], '--')
+py.show()
+
+
+# Time Domain Plots - Impulse Response
+time1_impulse = getData("01","10","10","1", "impulse")
+time3_impulse = data3.impulse_response()
+time4_impulse = data4.impulse_response()
+py.figure(6)
+py.plot(time1_impulse[0], time1_impulse[1], 'g--')
+py.plot(time3_impulse[0], time3_impulse[1], 'b--')
+py.plot(time4_impulse[0], time4_impulse[1], 'r--')
+plt.xlim(-0.02 * 10**(-7),0.07 * 10**(-7))
+py.show()
