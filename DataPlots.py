@@ -22,61 +22,66 @@ def getData(xx,yy,mm,nn, domain = 's', path = "Data\\"):
     return data
 
     
+if __name__ == "__main__":
+    data1 = getData("01","10","10","1")
+    data2 = getData("01","10","10","2")
+    data3 = getData("02","10","30","1")
+    data4 = getData("03","10","50","1")
+    print(data1)
+
+    # Plot data from adjacent measurment positions
+    py.figure(1)
+    data1.plot_s_db()
+    data2.plot_s_db()
+
+    py.figure(2)
+    data1.plot_s_deg()
+    data2.plot_s_deg()
+
+    py.figure(3)
+    data1.plot_s_smith()
+    data2.plot_s_smith()
+    py.show()
+
+    # Plot Data for same position and diameter but different depths
+    py.figure(4)
+    data1.plot_s_db()
+    data3.plot_s_db()
+    data4.plot_s_db()
+    py.show()
+
+    py.figure(5)
+    data1.plot_s_deg()
+    data3.plot_s_deg()
+    data4.plot_s_deg()
+    py.show()
+
+    # Check error handleing of getData function
+    data5 = getData("52", "10", "30", "37")
+    try:
+        assert data5 == -1
+    except AssertionError:
+        print("Error did not trigger")
 
 
-data1 = getData("01","10","10","1")
-data2 = getData("01","10","10","2")
-data3 = getData("02","10","30","1")
-data4 = getData("03","10","50","1")
-print(data1)
-'''
-# Plot data from adjacent measurment positions
-py.figure(1)
-data1.plot_s_db()
-data2.plot_s_db()
-
-py.figure(2)
-data1.plot_s_deg()
-data2.plot_s_deg()
-
-py.figure(3)
-data1.plot_s_smith()
-data2.plot_s_smith()
-py.show()
-
-# Plot Data for same position and diameter but different depths
-py.figure(4)
-data1.plot_s_db()
-data3.plot_s_db()
-data4.plot_s_db()
-py.show()
-
-# Check error handleing of getData function
-data5 = getData("52", "10", "30", "37")
-try:
-    assert data5 == -1
-except AssertionError:
-    print("Error did not trigger")
-'''
-
-# Time Domain Plots - Step Response
-time1_step = getData("01","10","10","1", "step")
-time3_step = data3.step_response()
-time4_step = data4.step_response()
-py.figure(5)
-py.plot(time1_step[0], time1_step[1], '--')
-py.plot(time3_step[0], time3_step[1], '--')
-py.plot(time4_step[0], time4_step[1], '--')
-py.show()
+    # Time Domain Plots - Step Response
+    time1_step = getData("01","10","10","1", "step")
+    time3_step = data3.step_response()
+    time4_step = data4.step_response()
+    py.figure(6)
+    py.plot(time1_step[0], time1_step[1], '--')
+    py.plot(time3_step[0], time3_step[1], '--')
+    py.plot(time4_step[0], time4_step[1], '--')
+    py.show()
 
 
-# Time Domain Plots - Impulse Response
-time1_impulse = getData("01","10","10","1", "impulse")
-time3_impulse = data3.impulse_response()
-time4_impulse = data4.impulse_response()
-py.figure(6)
-py.plot(time1_impulse[0], time1_impulse[1], 'g--')
-py.plot(time3_impulse[0], time3_impulse[1], 'b--')
-py.plot(time4_impulse[0], time4_impulse[1], 'r--')
-plt.xlim(-0.02 * 10**(-7),0.07 * 10**(-7))
-py.show()
+    # Time Domain Plots - Impulse Response
+    time1_impulse = getData("01","10","10","1", "impulse")
+    time3_impulse = data3.impulse_response()
+    time4_impulse = data4.impulse_response()
+    py.figure(7)
+    py.plot(time1_impulse[0], time1_impulse[1], 'g--')
+    py.plot(time3_impulse[0], time3_impulse[1], 'b--')
+    py.plot(time4_impulse[0], time4_impulse[1], 'r--')
+    plt.xlim(-0.02 * 10**(-7),0.07 * 10**(-7))
+    py.show()
