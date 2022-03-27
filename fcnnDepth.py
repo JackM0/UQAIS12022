@@ -51,7 +51,7 @@ for filename in os.listdir(path):
 
     # Get the associated data and binary vector
     if os.path.isfile(f):
-        data = (rf.Network(f).impulse_response())[1]
+        data = (rf.Network(f).impulse_response())[1][10:2085]
         label = getLabel(filename)
         if first == 1:
             Data = [data]
@@ -80,9 +80,9 @@ print(len(Test))
 
 
 # hyperparameters
-input_size = 4000
-output_size = 5
-hidden_size = 800
+input_size = 2085 - 10 #Length of truncated signal
+output_size = 5 # 5 Different Depths
+hidden_size = 800 # Not sure what to pick this these parameters, just run training with all of them and see whats best?
 
 epochs = 500
 batch_size = 500
@@ -115,6 +115,7 @@ for e in range(epochs):
     for i in range(0, Data.shape[0], batch_size):
         x_mini = Data[i:i + batch_size] 
         y_mini = Labels[i:i + batch_size] 
+        # Not sure how to manipulate the combined "Train" and "Test" Tensors so just doing this
         
         x_var = Variable(x_mini)
         y_var = Variable(y_mini)
