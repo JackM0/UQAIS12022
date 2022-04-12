@@ -27,9 +27,9 @@ input_size = 2085 - 10 #Length of truncated signal
 output_size = 5 # 5 Different Depths
 hidden_size = 1300 # Not sure what to pick this these parameters, just run training with all of them and see whats best?
 
-epochs = 5
+epochs = 30
 batch_size = 32
-learning_rate = 0.00005
+learning_rate = 0.00001
 
 # Split into training and testing data
 # Might be better to split in a more fair way
@@ -43,16 +43,18 @@ class Network(nn.Module):
         super(Network, self).__init__()
         self.bnorm = nn.BatchNorm1d(input_size)
         self.l1 = nn.Linear(input_size, hidden_size)
-        #self.relu = nn.ReLU()
+        self.relu = nn.ReLU()
         self.l2 = nn.Linear(hidden_size, hidden_size)
         self.l3 = nn.Linear(hidden_size, output_size)
+        self.tanh = nn.Tanh()
         
     def forward(self, x):
         x = self.bnorm(x)
         x = self.l1(x)
-        x = self.l2(x)
+        x = self.relu(x)
         x = self.l3(x)
-        return F.log_softmax(input = x, dim = 1)
+        x = self.tanh(x)
+        return x
 
 net = Network()
 print(net)
@@ -80,8 +82,8 @@ def train(dataset, network):
 
 def evaluate(validation, network):
     for data in validation:
-        m = torch.nn.Sigmoid()
-        net_out = m(network(data[0]))
+        net_out = network(data[0])
+        print(net_out)
         a = net_out.argmax(1)
         m = torch.zeros (net_out.shape).scatter (1, a.unsqueeze(1), 1.0)
         error = data[1] - m
@@ -96,7 +98,7 @@ def evaluate(validation, network):
     error = (100 - correct) 
     print(correct)
     print(error)
-
+    
 
 train(data_loader, net)
 evaluate(data_test, net)
