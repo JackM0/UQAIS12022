@@ -14,7 +14,7 @@ import os
 path = ".\\Data"
 
 # File to store data in
-stored = ".\Dataset.pt"
+stored = ".\DatasetDepth.pt"
 
 # Setups the strings to look for when contructing the binary vectors
 yy = ["10", "12", "16", "20", "24", "28"]

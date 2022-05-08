@@ -17,7 +17,7 @@ fileNum = 1903
 testNum = 100
 
 # Location of data
-stored = ".\DatasetDepth.pt"
+stored = ".\Dataset.pt"
 
 # Load Dataset
 Dataset = torch.load(stored)
@@ -27,9 +27,9 @@ input_size = 2085 - 10 #Length of truncated signal
 output_size = 5 # 5 Different Depths
 hidden_size = 1300 # Not sure what to pick this these parameters, just run training with all of them and see whats best?
 
-epochs = 100
+epochs = 5
 batch_size = 32
-learning_rate = 0.000001
+learning_rate = 0.00005
 
 # Split into training and testing data
 # Might be better to split in a more fair way
@@ -41,21 +41,18 @@ class Network(nn.Module):
     
     def __init__(self):
         super(Network, self).__init__()
-        self.bnorm = nn.BatchNorm1d(hidden_size)
+        self.bnorm = nn.BatchNorm1d(input_size)
         self.l1 = nn.Linear(input_size, hidden_size)
-        self.relu = nn.ReLU()
+        #self.relu = nn.ReLU()
         self.l2 = nn.Linear(hidden_size, hidden_size)
         self.l3 = nn.Linear(hidden_size, output_size)
         
     def forward(self, x):
+        x = self.bnorm(x)
         x = self.l1(x)
-        x = self.bnorm(x)
-        x = self.relu(x)
         x = self.l2(x)
-        x = self.bnorm(x)
-        x = self.relu(x)
         x = self.l3(x)
-        return F.log_softmax(x, dim=0)
+        return F.log_softmax(input = x, dim = 1)
 
 net = Network()
 print(net)
@@ -71,9 +68,6 @@ def train(dataset, network):
         for data in dataset:
             x_var = data[0]
             y_var = data[1]
-
-            #x_var = x_var.to(device, torch.float)
-            #y_var = y_var.to(device, torch.long)
             
             optimizer.zero_grad()
             net_out = network(x_var)
@@ -85,21 +79,24 @@ def train(dataset, network):
         print('Epoch: {} - Loss: {:.6f}'.format(e, loss.item()))
 
 def evaluate(validation, network):
-    correct = 0
     for data in validation:
-        net_out = network(data[0])
-        print(net_out)
+        m = torch.nn.Sigmoid()
+        net_out = m(network(data[0]))
         a = net_out.argmax(1)
-        b = data[1].argmax(1)
-        diff = a - b
-        for element in diff:
-            if element == 0:
-                correct += 1
+        m = torch.zeros (net_out.shape).scatter (1, a.unsqueeze(1), 1.0)
+        error = data[1] - m
     
+    correct = 0
+    for i in range(100):
+        print(error[i])
+        L = nn.CrossEntropyLoss()
+        if (torch.all(torch.eq(error[i],torch.Tensor([0,0,0,0,0])))):
+            correct += 1
+
     error = (100 - correct) 
     print(correct)
     print(error)
-    
+
 
 train(data_loader, net)
 evaluate(data_test, net)

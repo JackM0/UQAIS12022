@@ -17,18 +17,18 @@ fileNum = 1903
 testNum = 100
 
 # Location of data
-stored = ".\Dataset.pt"
+stored = ".\DatasetDepthDiameter.pt"
 
 # Load Dataset
 Dataset = torch.load(stored)
 
 # hyperparameters
 input_size = 2085 - 10 #Length of truncated signal
-output_size = 5 # 5 Different Depths
+output_size = 30 # 5 Different Depths, 6 Different Diameters
 hidden_size = 1300 # Not sure what to pick this these parameters, just run training with all of them and see whats best?
 
 epochs = 100
-batch_size = 32
+batch_size = 64
 learning_rate = 0.000001
 
 # Split into training and testing data
@@ -45,7 +45,8 @@ class Network(nn.Module):
         self.l1 = nn.Linear(input_size, hidden_size)
         self.relu = nn.ReLU()
         self.l2 = nn.Linear(hidden_size, hidden_size)
-        self.l3 = nn.Linear(hidden_size, output_size)
+        self.l3 = nn.Linear(hidden_size, hidden_size)
+        self.l4 = nn.Linear(hidden_size, output_size)
         
     def forward(self, x):
         x = self.l1(x)
@@ -55,6 +56,9 @@ class Network(nn.Module):
         x = self.bnorm(x)
         x = self.relu(x)
         x = self.l3(x)
+        x = self.bnorm(x)
+        x = self.relu(x)
+        x = self.l4(x)
         return F.log_softmax(x, dim=0)
 
 net = Network()
