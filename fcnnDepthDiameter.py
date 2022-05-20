@@ -25,16 +25,16 @@ Dataset = torch.load(stored)
 # hyperparameters
 input_size = 2085 - 10  # Length of truncated signal
 output_size = 30  # 5 Different Depths, 6 Different Diameters
-hidden_size = 1500  # Not sure what to pick this these parameters, just run training with all of them and see whats best?
+hidden_size = 40  # Not sure what to pick this these parameters, just run training with all of them and see whats best?
 
-epochs = 100
+epochs = 2000
 batch_size = 64
-learning_rate = 0.0005
+learning_rate = 0.00005
 
 # Split into training and testing data
 # Might be better to split in a more fair way
 Train, Test = torch.utils.data.random_split(
-    Dataset, [fileNum - testNum, testNum], generator=torch.Generator().manual_seed(41)
+    Dataset, [fileNum - testNum, testNum], generator=torch.Generator().manual_seed(40)
 )
 
 
