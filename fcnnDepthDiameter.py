@@ -11,13 +11,13 @@ from torch.autograd import Variable
 import os
 
 # Number of files
-fileNum = 1903
+fileNum = 1467 # 1903 
 
 # Number of files to be use as test data
 testNum = 100
 
 # Location of data
-stored = ".\DatasetDepthDiameter.pt"
+stored = ".\DatasetDiameterNormalised.pt"
 
 # Load Dataset
 Dataset = torch.load(stored)
@@ -25,11 +25,11 @@ Dataset = torch.load(stored)
 # hyperparameters
 input_size = 2085 - 10 #Length of truncated signal
 output_size = 30 # 5 Different Depths, 6 Different Diameters
-hidden_size = 1300 # Not sure what to pick this these parameters, just run training with all of them and see whats best?
+hidden_size = 1500 # Not sure what to pick this these parameters, just run training with all of them and see whats best?
 
-epochs = 100
+epochs = 80
 batch_size = 64
-learning_rate = 0.000001
+learning_rate = 0.0001
 
 # Split into training and testing data
 # Might be better to split in a more fair way
