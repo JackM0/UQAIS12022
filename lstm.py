@@ -25,11 +25,11 @@ Dataset = torch.load(stored)
 # hyperparameters
 input_size = 2085 - 10  # Length of truncated signal
 output_size = 30  # 5 Different Depths, 6 Different Diameters
-hidden_size = 40  # Not sure what to pick this these parameters, just run training with all of them and see whats best?
+hidden_size = 10  # Not sure what to pick this these parameters, just run training with all of them and see whats best?
 
-epochs = 2000
+epochs = 300
 batch_size = 64
-learning_rate = 0.00005
+learning_rate = 0.01
 
 # Split into training and testing data
 # Might be better to split in a more fair way
@@ -39,34 +39,22 @@ Train, Test = torch.utils.data.random_split(
 
 
 class Network(nn.Module):
-    def __init__(self):
+    def __init__(self, input_dim, hidden_dim, target_size):
         super(Network, self).__init__()
-        self.bnorm = nn.BatchNorm1d(hidden_size)
-        self.l1 = nn.Linear(input_size, hidden_size)
-        self.relu = nn.ReLU()
-        self.l2 = nn.Linear(hidden_size, hidden_size)
-        self.l3 = nn.Linear(hidden_size, hidden_size)
-        self.l4 = nn.Linear(hidden_size, output_size)
+        self.lstm = nn.LSTM(input_dim, hidden_dim, batch_first=True)
+        self.fc = nn.Linear(hidden_dim, target_size)
 
-    def forward(self, x):
-        x = self.l1(x)
-        x = self.bnorm(x)
-        x = self.relu(x)
-        x = self.l2(x)
-        x = self.bnorm(x)
-        x = self.relu(x)
-        x = self.l3(x)
-        x = self.bnorm(x)
-        x = self.relu(x)
-        x = self.l4(x)
-        return F.log_softmax(x, dim=0)
+    def forward(self, input_):
+        lstm_out, (h, c) = self.lstm(input_)
+        logits = self.fc(lstm_out[:, :])
+        scores = F.log_softmax(logits, dim=0)
+        return scores
 
-
-net = Network()
+net = Network(input_size, hidden_size, output_size)
 print(net)
 
 optimizer = optim.Adam(net.parameters(), lr=learning_rate)
-loss_func = nn.CrossEntropyLoss()
+loss_func = nn.BCEWithLogitsLoss()
 
 data_loader = torch.utils.data.DataLoader(Train, batch_size, shuffle=True)
 data_test = torch.utils.data.DataLoader(Test, testNum, shuffle=True)
